@@ -1,3 +1,3 @@
 session "Circus_Toolkit" = "Z_Toolkit" + 
-  options [document = none]
+  options [document = false]
   theories Circus_Toolkit
