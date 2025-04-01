@@ -67,8 +67,11 @@ fun rec_unfold_proof ctx (n, rec_eq) =
   in ctx1
   end;
 
+(* FIXME: Check whether names in declarations and equations are consistent. Extract names from equations, instead of declaration, so the latter can be optional. *)
+
 fun define_recursive (rec_decls, ts) ctx = 
   let open Syntax; open HOLogic; open Logic; open Specification; open Local_Theory
+      val _ = if length rec_decls > length ts then error "There are more declarations than equations" else true
       val ctx' = snd (Local_Theory.begin_nested ctx)
       val lfp = const @{const_name lfp}
       val recs = map (fn (n, ty) => (n, parse_typ ctx' ty)) rec_decls

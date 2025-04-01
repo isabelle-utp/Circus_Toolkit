@@ -16,14 +16,18 @@ axiomatization
   where
   cseq_mono [mono_rule]: "\<lbrakk> P \<le> P'; Q \<le> Q' \<rbrakk> \<Longrightarrow> P ;; Q \<le> P' ;; Q'"
 
-datatype ev = tick
+datatype ev = tick | view nat
 
-recursive CountUp :: "nat \<Rightarrow> (ev, unit) action" and CountDown :: "nat \<Rightarrow> (ev, unit) action" where
-"CountUp(n) = cdo(tick) ;; CountDown(n + 1)" |
-"CountDown(n) = cdo(tick) ;; CountUp(n - 1)"
+recursive CountUp :: "nat \<Rightarrow> (ev, unit) action" 
+  and View :: "nat \<Rightarrow> (ev, unit) action"
+  and CountDown :: "nat \<Rightarrow> (ev, unit) action" where
+"CountUp(n) = cdo(tick) ;; View(n) ;; CountDown(n + 1)" |
+"View(n) = cdo(view n)" |
+"CountDown(n) = cdo(tick) ;; View(n) ;; CountUp(n - 1)"
 
 thm CountDown_unfold
-  
+thm View_unfold
+
 recursive P :: "int \<Rightarrow> bool" and Q :: "int \<Rightarrow> bool" where
 "P(n) = Q(n + 1)" |
 "Q(n) = P(n - 1)"
