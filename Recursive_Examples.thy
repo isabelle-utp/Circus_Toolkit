@@ -29,7 +29,7 @@ thm CountDown_unfold
 thm View_unfold
 
 recursive P :: "int \<Rightarrow> bool" and Q :: "int \<Rightarrow> bool" where
-"P(n) = Q(n + 1)" |
+"P n = Q(n + 1)" |
 "Q(n) = P(n - 1)"
 
 end

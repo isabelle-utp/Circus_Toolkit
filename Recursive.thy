@@ -28,18 +28,20 @@ assign_Free_type (f $ e) m = assign_Free_type f m $ assign_Free_type e m |
 assign_Free_type (Abs (x, ty, t)) m = Abs (x, ty, assign_Free_type t m) |
 assign_Free_type t _ = t
 
+(* Extract the constant name, target type, and lambda term from an equation *)
 fun rec_eq ctx recmap recT t =
   let open Syntax; open HOLogic
       val eq = case assign_Free_type (Type.strip_constraints (parse_term ctx t)) recmap of 
                  Const ("HOL.eq", _) $ x $ y => check_term ctx (Const ("HOL.eq", recT --> recT --> dummyT) $ x $ y) |
-                 _ => raise Match
+                 _ => error "Non-equation given in recursive definition"
+      (* List.foldr (fn (x, y) => HOLogic.tupled_lambda x y) @{term "()"} [@{term "(x, y)"}, @{term z}] *)
   in 
     case eq of
       Const ("HOL.eq", _) $ (Free (n, _) $ ps) $ recurse => 
-        ((n, fastype_of ps --> recT), tupled_lambda ps recurse) |
+        ((n, the_default (fastype_of ps --> recT) (Symtab.lookup recmap n)), tupled_lambda ps recurse) |
       Const  ("HOL.eq", _) $ (Free (n, _)) $ recurse => 
-        ((n, recT), recurse) |
-      _ => raise Match
+        ((n, the_default recT (Symtab.lookup recmap n)), recurse) |
+      _ => error "Malformed equation in recursion definition"
 end
 
 fun tuple_proj n i t =
