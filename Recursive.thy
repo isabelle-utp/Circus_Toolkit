@@ -29,19 +29,18 @@ assign_Free_type (Abs (x, ty, t)) m = Abs (x, ty, assign_Free_type t m) |
 assign_Free_type t _ = t
 
 (* Extract the constant name, target type, and lambda term from an equation *)
-fun rec_eq ctx recmap recT t =
+fun rec_eq ctx recmap eq_term =
   let open Syntax; open HOLogic
-      val eq = case assign_Free_type (Type.strip_constraints (parse_term ctx t)) recmap of 
-                 Const ("HOL.eq", _) $ x $ y => check_term ctx (Const ("HOL.eq", recT --> recT --> dummyT) $ x $ y) |
-                 _ => error "Non-equation given in recursive definition"
-      (* List.foldr (fn (x, y) => HOLogic.tupled_lambda x y) @{term "()"} [@{term "(x, y)"}, @{term z}] *)
+      val enriched_term = check_term ctx (assign_Free_type (Type.strip_constraints (parse_term ctx eq_term)) recmap)
+      val ((name, params), rhs) 
+        = case enriched_term of
+          Const ("HOL.eq", _) $ lhs $ rhs => (strip_comb lhs, rhs) |
+          _ => error "Non-equation given in recursive definition"
+      val (ident, constT) = case name of
+                            Free (n, t) => (n, t) |
+                            _ => error "Each equation must have a free variable at the head"
   in 
-    case eq of
-      Const ("HOL.eq", _) $ (Free (n, _) $ ps) $ recurse => 
-        ((n, the_default (fastype_of ps --> recT) (Symtab.lookup recmap n)), tupled_lambda ps recurse) |
-      Const  ("HOL.eq", _) $ (Free (n, _)) $ recurse => 
-        ((n, the_default recT (Symtab.lookup recmap n)), recurse) |
-      _ => error "Malformed equation in recursion definition"
+    ((ident, constT), List.foldr (fn (x, y) => HOLogic.tupled_lambda x y) rhs params)
 end
 
 fun tuple_proj n i t =
@@ -69,29 +68,33 @@ fun rec_unfold_proof ctx (n, rec_eq) =
   in ctx1
   end;
 
+(* Make a set of recursive definitions, based on set of declarations and equations *)
+
 (* FIXME: Check whether names in declarations and equations are consistent. Extract names from equations, instead of declaration, so the latter can be optional. *)
 
-fun define_recursive (rec_decls, ts) ctx = 
+fun define_recursive (raw_rec_decls, raw_rec_eqs) ctx = 
   let open Syntax; open HOLogic; open Logic; open Specification; open Local_Theory
-      val _ = if length rec_decls > length ts then error "There are more declarations than equations" else true
+      val _ = if length raw_rec_decls > length raw_rec_eqs 
+              then error "More declarations than equations in recursive definition" 
+              else true
       val ctx' = snd (Local_Theory.begin_nested ctx)
+      (* FIXME: Allow a different fixed-point operator (e.g. gfp) to be provided; will need to adapt the proof as well. *)
       val lfp = const @{const_name lfp}
-      val recs = map (fn (n, ty) => (n, parse_typ ctx' ty)) rec_decls
-      val recT = body_type (snd (hd recs))
-      val rec_map = (Symtab.make recs)
-      val eqs = map (rec_eq ctx' rec_map recT) ts
-      val fst_recn = fst (hd rec_decls) 
+      val rec_decls = map (fn (n, ty) => (n, parse_typ ctx' ty)) raw_rec_decls
+      val rec_map = Symtab.make rec_decls
+      val rec_funs = map (rec_eq ctx' rec_map) raw_rec_eqs
+      val fst_recn = fst (fst (hd rec_funs)) 
       val recfunn = fst_recn ^ "_rec_fun"
-      val recs = mk_tuple (map snd eqs)
-      val ps = mk_tuple (map (Free o fst) eqs)
+      val recs = mk_tuple (map snd rec_funs)
+      val ps = mk_tuple (map (Free o fst) rec_funs)
       val rec_fun = tupled_lambda ps recs
       fun def ctx (n, eq) atts = definition (SOME (Binding.name n, NONE, NoSyn)) [] [] ((Binding.name (n ^ "_def"), atts), eq) ctx
       val ((recfun_term, _), ctx0) = def ctx' (recfunn, Syntax.check_term ctx' (mk_equals (Free (recfunn, dummyT), rec_fun))) @{attributes [rec_sys_defs]}
-      val rec_nms = map (fn (n, i) => (n, mk_equals (Free (n, dummyT), tuple_proj (length eqs) i (check_term ctx0 (lfp $ recfun_term))))) (ListPair.zip (map (fst o fst) eqs, 0 upto (length eqs - 1)))
+      val rec_nms = map (fn (n, i) => (n, mk_equals (Free (n, dummyT), tuple_proj (length rec_funs) i (check_term ctx0 (lfp $ recfun_term))))) (ListPair.zip (map (fst o fst) rec_funs, 0 upto (length rec_funs - 1)))
       val monothm = mono_proof recfun_term ctx0
       val ctx1 = snd (note ((Binding.name ("mono_" ^ recfunn), @{attributes [mono_rule]}), [monothm]) ctx0)
       val ctx2 = Local_Theory.end_nested (fold (fn eq => fn ctx' => snd (def ctx' eq @{attributes [recursive_defs]})) rec_nms ctx1)
-      val rec_eqs = map (read_term ctx2) ts
+      val rec_eqs = map (read_term ctx2) raw_rec_eqs
       val ctx3 = fold (fn (n, rec_eq) => fn ctx' => rec_unfold_proof ctx' (n, rec_eq)) (ListPair.zip (map fst rec_decls, rec_eqs)) ctx2
   in
     ctx3
@@ -101,8 +104,8 @@ end;
 Outer_Syntax.command
   @{command_keyword recursive}
   "definitions through general recursive equations over complex lattices" 
-  (((((Parse.name -- (Parse.$$$ "::" |-- Parse.typ)) 
-                  -- Scan.repeat (@{keyword "and"} |-- (Parse.name -- (Parse.$$$ "::" |-- Parse.typ)))) >> (fn (x, xs) => x :: xs)) -- 
+  ((Scan.optional (((Parse.name -- (Parse.$$$ "::" |-- Parse.typ)) 
+                     -- Scan.repeat (@{keyword "and"} |-- (Parse.name -- (Parse.$$$ "::" |-- Parse.typ)))) >> (fn (x, xs) => x :: xs)) [] -- 
   (@{keyword "where"} |-- Parse.enum1 "|" Parse.term))
    >> (Toplevel.local_theory NONE NONE o Recursive_Def.define_recursive)) 
 

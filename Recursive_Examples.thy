@@ -18,13 +18,14 @@ axiomatization
 
 datatype ev = tick | view nat
 
-recursive CountUp :: "nat \<Rightarrow> (ev, unit) action" 
+recursive CountUp :: "nat \<Rightarrow> nat \<Rightarrow> _" 
   and View :: "nat \<Rightarrow> (ev, unit) action"
   and CountDown :: "nat \<Rightarrow> (ev, unit) action" where
-"CountUp(n) = cdo(tick) ;; View(n) ;; CountDown(n + 1)" |
+"CountUp m n = cdo(tick) ;; View(m) ;; CountDown(n + 1)" |
 "View(n) = cdo(view n)" |
-"CountDown(n) = cdo(tick) ;; View(n) ;; CountUp(n - 1)"
+"CountDown(n) = cdo(tick) ;; View(n) ;; CountUp 0 (n - 1)"
 
+thm CountUp_unfold
 thm CountDown_unfold
 thm View_unfold
 
