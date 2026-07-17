@@ -5,4 +5,5 @@ theory Circus_Toolkit
     Recursive
     Channels_Events
     Trace_Algebra
+    IsaCircus_Syntax
 begin end
