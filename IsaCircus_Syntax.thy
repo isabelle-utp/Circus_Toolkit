@@ -66,22 +66,22 @@ subsection \<open> Syntax Translations \<close>
 
 syntax 
   "_Spec"           :: "svids \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_:[_,_]" [100,0,0] 100)
-  "_Guard"          :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<^bold>& _" [58, 59] 58)
+  "_Guard"          :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<^bold>& _" [59, 60] 59)
   "_InputPrefix"    :: "chan \<Rightarrow> pttrn \<Rightarrow> logic \<Rightarrow> logic" ("_\<^bold>?_ \<rightarrow> _" [59, 0, 60] 60)
   "_OutputPrefix"   :: "chan \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_\<^bold>!_ \<rightarrow> _" [59, 0, 60] 60)
   "_SyncPrefix"     :: "chan \<Rightarrow> logic \<Rightarrow> logic" ("_ \<rightarrow> _" [59, 60] 60)
-  "_ParallelAct"    :: "logic \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_|_|_\<rbrakk> _" [60, 0, 0, 0, 61] 60)
-  "_Parallel"       :: "logic \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_\<rbrakk> _" [60, 0,  61] 60)
-  "_Interleave"     :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<interleave>" 60)
-  "_InterleaveAct"  :: "logic \<Rightarrow> svids \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_|_\<rbrakk> _" [60, 0, 0, 61] 60)
+  "_ParallelAct"    :: "logic \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_|_|_\<rbrakk> _" [58, 0, 0, 0, 59] 58)
+  "_Parallel"       :: "logic \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_\<rbrakk> _" [58, 0,  59] 58)
+  "_Interleave"     :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<interleave>" 58)
+  "_InterleaveAct"  :: "logic \<Rightarrow> svids \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_|_\<rbrakk> _" [58, 0, 0, 59] 58)
   "_Hide"           :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<Zhide> _" [60, 61] 60)
   "_Rename"         :: "logic \<Rightarrow> rnenum \<Rightarrow> logic" ("_ [_]" [60, 0] 61)
   "_Interrupt"      :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<triangle>" 58)
   "_ExtChoice"      :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<box>" 59)
-  "_ExtChoiceIdx"   :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<box> _ \<in> _. _" [0, 0, 10] 10)
-  "_InterleaveIter" :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<interleave> _ \<in> _. _" [0, 0, 10] 10)
-  "_SequentialIter" :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" (";; _ \<in> _. _" [0, 0, 10] 10)
-  "_ParallelIter"   :: "logic \<Rightarrow> id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<lbrakk> _ \<rbrakk> _ \<in> _. _" [0, 0, 10] 10)
+  "_ExtChoiceIdx"   :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<box>_/\<in>_. _" [0, 0, 10] 10)
+  "_InterleaveIter" :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<interleave>_/\<in> _. _" [0, 0, 10] 10)
+  "_SequentialIter" :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" (";;_/\<in>_. _" [0, 0, 10] 10)
+  "_ParallelIter"   :: "logic \<Rightarrow> id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<lbrakk>_\<rbrakk>_/\<in>_. _" [0, 0, 10] 10)
 
 translations 
   "_Spec a p q"                \<rightleftharpoons> "CONST Spec a (p)\<^sub>e (q)\<^sub>e"
@@ -89,10 +89,10 @@ translations
   "_InputPrefix c x P"         \<rightleftharpoons> "CONST InputPrefix c (\<lambda> x. ((CONST True)\<^sub>e, P))"
   "_OutputPrefix c e P"        \<rightleftharpoons> "CONST OutputPrefix c (e)\<^sub>e P"
   "_SyncPrefix c P"            \<rightleftharpoons> "CONST SyncPrefix c P"
-  "_Parallel P A Q"            \<rightleftharpoons> "CONST Parallel A P Q"
-  "_ParallelAct P ns1 A ns2 Q" \<rightleftharpoons> "CONST ParallelAct ns1 ns2 A P Q"
   "_Interleave P Q"            \<rightleftharpoons> "CONST Parallel {} P Q"
   "_InterleaveAct P ns1 ns2 Q" \<rightleftharpoons> "CONST ParallelAct ns1 ns2 {} P Q"
+  "_Parallel P A Q"            \<rightleftharpoons> "CONST Parallel A P Q"
+  "_ParallelAct P ns1 A ns2 Q" \<rightleftharpoons> "CONST ParallelAct ns1 ns2 A P Q"
   "_Hide P A"                  \<rightleftharpoons> "CONST Hide P A"
   "_Rename P f"                \<rightleftharpoons> "CONST Rename P f"
   "_ExtChoice P Q"             \<rightleftharpoons> "CONST ExtChoice P Q"
@@ -101,5 +101,26 @@ translations
   "_InterleaveIter x I P"      \<rightleftharpoons> "CONST Replicate (CONST Parallel {}) Skip I (\<lambda> x. P)"
   "_SequentialIter x I P"      \<rightleftharpoons> "CONST Replicate (CONST useq) Skip I (\<lambda> x. P)"
   "_ParallelIter A x I P"      \<rightleftharpoons> "CONST Replicate (CONST Parallel A) Skip I (\<lambda> x. P)"
+
+syntax_consts 
+  "_Spec" \<rightleftharpoons> Spec and
+  "_Guard" \<rightleftharpoons> Guard and
+  "_InputPrefix" \<rightleftharpoons> InputPrefix and 
+  "_OutputPrefix" \<rightleftharpoons> OutputPrefix and
+  "_SyncPrefix" \<rightleftharpoons> SyncPrefix and
+  "_Parallel" \<rightleftharpoons> Parallel and
+  "_ParallelAct" \<rightleftharpoons> ParallelAct and
+  "_Interleave" \<rightleftharpoons> Parallel and
+  "_InterleaveAct" \<rightleftharpoons> ParallelAct and
+  "_Hide" \<rightleftharpoons> Hide and
+  "_Rename" \<rightleftharpoons> Rename and
+  "_ExtChoice" \<rightleftharpoons> ExtChoice and
+  "_ExtChoiceIdx" \<rightleftharpoons> ExtChoiceIdx and
+  "_Interrupt" \<rightleftharpoons> Interrupt and
+  "_InterleaveIter" \<rightleftharpoons> Parallel and
+  "_SequentialIter" \<rightleftharpoons> useq and
+  "_ParallelIter" \<rightleftharpoons> Parallel
+
+unbundle Circus_Syntax
 
 end
