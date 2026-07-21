@@ -66,7 +66,7 @@ subsection \<open> Syntax Translations \<close>
 
 syntax 
   "_Spec"           :: "svids \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_:[_,_]" [100,0,0] 100)
-  "_Guard"          :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<^bold>& _" [59, 60] 59)
+  "_Guard"          :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<^bold>& _" [59, 60] 60)
   "_InputPrefix"    :: "chan \<Rightarrow> pttrn \<Rightarrow> logic \<Rightarrow> logic" ("_\<^bold>?_ \<rightarrow> _" [59, 0, 60] 60)
   "_OutputPrefix"   :: "chan \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_\<^bold>!_ \<rightarrow> _" [59, 0, 60] 60)
   "_SyncPrefix"     :: "chan \<Rightarrow> logic \<Rightarrow> logic" ("_ \<rightarrow> _" [59, 60] 60)
@@ -74,10 +74,10 @@ syntax
   "_Parallel"       :: "logic \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_\<rbrakk> _" [58, 0,  59] 58)
   "_Interleave"     :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<interleave>" 58)
   "_InterleaveAct"  :: "logic \<Rightarrow> svids \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_|_\<rbrakk> _" [58, 0, 0, 59] 58)
-  "_Hide"           :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<Zhide> _" [60, 61] 60)
+  "_Hide"           :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<Zhide> _" [60, 61] 61)
   "_Rename"         :: "logic \<Rightarrow> rnenum \<Rightarrow> logic" ("_ [_]" [60, 0] 61)
-  "_Interrupt"      :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<triangle>" 58)
-  "_ExtChoice"      :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<box>" 59)
+  "_Interrupt"      :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<triangle>" 57)
+  "_ExtChoice"      :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<box>" 58)
   "_ExtChoiceIdx"   :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<box>_/\<in>_. _" [0, 0, 10] 10)
   "_InterleaveIter" :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<interleave>_/\<in> _. _" [0, 0, 10] 10)
   "_SequentialIter" :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" (";;_/\<in>_. _" [0, 0, 10] 10)
