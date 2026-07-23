@@ -49,13 +49,13 @@ consts
   InputPrefix  :: "('a, 'e) channel \<Rightarrow> 'a set \<Rightarrow> ('a \<Rightarrow> (('s \<Rightarrow> bool) \<times> 'action)) \<Rightarrow> 'action"
   OutputPrefix :: "('a, 'e) channel \<Rightarrow> ('a, 's) expr \<Rightarrow> 'action \<Rightarrow> 'action"
   SyncPrefix   :: "(unit, 'e) channel \<Rightarrow> 'action \<Rightarrow> 'action"
-  ExtChoice    :: "'action \<Rightarrow> 'action \<Rightarrow> 'action" 
+  ExtChoice    :: "'action \<Rightarrow> 'action \<Rightarrow> 'action" (infixl "\<box>" 58)
   ExtChoiceIdx :: "'i set \<Rightarrow> ('i \<Rightarrow> 'action) \<Rightarrow> 'action"
   Rename       :: "('e \<leftrightarrow> 'f) \<Rightarrow> 'action \<Rightarrow> 'action"
   Hide         :: "'action \<Rightarrow> 'e set \<Rightarrow> 'action"
   ParallelAct  :: "('a \<Longrightarrow> 's) \<Rightarrow> ('b \<Longrightarrow> 's) \<Rightarrow> 'e set \<Rightarrow> 'action \<Rightarrow> 'action \<Rightarrow> 'action"
   Parallel     :: "'e set \<Rightarrow> 'action \<Rightarrow> 'action \<Rightarrow> 'action"
-  Interrupt    :: "'action \<Rightarrow> 'action \<Rightarrow> 'action" 
+  Interrupt    :: "'action \<Rightarrow> 'action \<Rightarrow> 'action" (infixl "\<triangle>" 57)
 
 text \<open> Higher-order replication over a finite set \<close>
 
@@ -82,8 +82,6 @@ syntax
   "_InterleaveAct"  :: "logic \<Rightarrow> svids \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_|_\<rbrakk> _" [58, 0, 0, 59] 58)
   "_Hide"           :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<Zhide> _" [60, 61] 61)
   "_Rename"         :: "logic \<Rightarrow> rnenum \<Rightarrow> logic" ("_ [_]" [60, 0] 61)
-  "_Interrupt"      :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<triangle>" 57)
-  "_ExtChoice"      :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<box>" 58)
   "_ExtChoiceIdx"   :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<box>_/\<in>_. _" [0, 0, 10] 10)
   "_InterleaveIter" :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<interleave>_/\<in> _. _" [0, 0, 10] 10)
   "_SequentialIter" :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" (";;_/\<in>_. _" [0, 0, 10] 10)
@@ -98,15 +96,13 @@ translations
   "_InputBCPrefix c x A B P"   \<rightleftharpoons> "CONST InputPrefix c A (\<lambda> x. ((B)\<^sub>e, P))"
   "_OutputPrefix c e P"        \<rightleftharpoons> "CONST OutputPrefix c (e)\<^sub>e P"
   "_SyncPrefix c P"            \<rightleftharpoons> "CONST SyncPrefix c P"
-  "_Interleave P Q"            \<rightleftharpoons> "CONST Parallel {} P Q"
+  "_Interleave"                \<rightleftharpoons> "CONST Parallel {}"
   "_InterleaveAct P ns1 ns2 Q" \<rightleftharpoons> "CONST ParallelAct ns1 ns2 {} P Q"
   "_Parallel P A Q"            \<rightleftharpoons> "CONST Parallel A P Q"
   "_ParallelAct P ns1 A ns2 Q" \<rightleftharpoons> "CONST ParallelAct ns1 ns2 A P Q"
   "_Hide P A"                  \<rightleftharpoons> "CONST Hide P A"
   "_Rename P f"                \<rightleftharpoons> "CONST Rename P f"
-  "_ExtChoice P Q"             \<rightleftharpoons> "CONST ExtChoice P Q"
   "_ExtChoiceIdx x A P"        \<rightleftharpoons> "CONST ExtChoiceIdx A (\<lambda> x. P)"
-  "_Interrupt P Q"             \<rightleftharpoons> "CONST Interrupt P Q"
   "_InterleaveIter x I P"      \<rightleftharpoons> "CONST Replicate (CONST Parallel {}) Skip I (\<lambda> x. P)"
   "_SequentialIter x I P"      \<rightleftharpoons> "CONST Replicate (CONST useq) Skip I (\<lambda> x. P)"
   "_ParallelIter A x I P"      \<rightleftharpoons> "CONST Replicate (CONST Parallel A) Skip I (\<lambda> x. P)"
@@ -126,9 +122,7 @@ syntax_consts
   "_InterleaveAct" \<rightleftharpoons> ParallelAct and
   "_Hide" \<rightleftharpoons> Hide and
   "_Rename" \<rightleftharpoons> Rename and
-  "_ExtChoice" \<rightleftharpoons> ExtChoice and
   "_ExtChoiceIdx" \<rightleftharpoons> ExtChoiceIdx and
-  "_Interrupt" \<rightleftharpoons> Interrupt and
   "_InterleaveIter" \<rightleftharpoons> Parallel and
   "_SequentialIter" \<rightleftharpoons> useq and
   "_ParallelIter" \<rightleftharpoons> Parallel
