@@ -46,7 +46,7 @@ consts
   Chaos        :: "'action" ("Chaos")
   Guard        :: "(bool, 's) expr \<Rightarrow> 'action \<Rightarrow> 'action"
   Assume       :: "(bool, 's) expr \<Rightarrow> 'action"
-  InputPrefix  :: "('a, 'e) channel \<Rightarrow> ('a \<Rightarrow> (('s \<Rightarrow> bool) \<times> 'action)) \<Rightarrow> 'action"
+  InputPrefix  :: "('a, 'e) channel \<Rightarrow> 'a set \<Rightarrow> ('a \<Rightarrow> (('s \<Rightarrow> bool) \<times> 'action)) \<Rightarrow> 'action"
   OutputPrefix :: "('a, 'e) channel \<Rightarrow> ('a, 's) expr \<Rightarrow> 'action \<Rightarrow> 'action"
   SyncPrefix   :: "(unit, 'e) channel \<Rightarrow> 'action \<Rightarrow> 'action"
   ExtChoice    :: "'action \<Rightarrow> 'action \<Rightarrow> 'action" 
@@ -67,8 +67,14 @@ subsection \<open> Syntax Translations \<close>
 syntax 
   "_Spec"           :: "svids \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_:[_,_]" [100,0,0] 100)
   "_Guard"          :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<^bold>& _" [59, 60] 60)
-  "_InputPrefix"    :: "chan \<Rightarrow> pttrn \<Rightarrow> logic \<Rightarrow> logic" ("_\<^bold>?_ \<rightarrow> _" [59, 0, 60] 60)
-  "_OutputPrefix"   :: "chan \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_\<^bold>!_ \<rightarrow> _" [59, 0, 60] 60)
+  "_InputPrefix"    :: "chan \<Rightarrow> pttrn \<Rightarrow> logic \<Rightarrow> logic" ("(3(_)\<^bold>?(_) /\<rightarrow> _)" [59, 0, 60] 60)
+  \<comment> \<open> Bounded Prefix \<close>
+  "_InputBPrefix"   :: "chan \<Rightarrow> pttrn \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("(3(_)\<^bold>?(_)\<in>(_) /\<rightarrow> _)" [59, 0, 0, 60] 60)
+  \<comment> \<open> Constrained Prefix \<close>
+  "_InputCPrefix"   :: "chan \<Rightarrow> pttrn \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("(3(_)\<^bold>?(_) | (_) /\<rightarrow> _)" [59, 0, 0, 60] 60)
+  \<comment> \<open> Bounded and Constrained Prefix \<close>
+  "_InputBCPrefix"  :: "chan \<Rightarrow> pttrn \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("(3(_)\<^bold>?(_)\<in>(_) /| (_) /\<rightarrow> _)" [59, 0, 0, 0, 60] 60)
+  "_OutputPrefix"   :: "chan \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("(3(_)\<^bold>!(_) /\<rightarrow> _)" [59, 0, 60] 60)
   "_SyncPrefix"     :: "chan \<Rightarrow> logic \<Rightarrow> logic" ("_ \<rightarrow> _" [59, 60] 60)
   "_ParallelAct"    :: "logic \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_|_|_\<rbrakk> _" [58, 0, 0, 0, 59] 58)
   "_Parallel"       :: "logic \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_\<rbrakk> _" [58, 0,  59] 58)
@@ -86,7 +92,10 @@ syntax
 translations 
   "_Spec a p q"                \<rightleftharpoons> "CONST Spec a (p)\<^sub>e (q)\<^sub>e"
   "_Guard b P"                 \<rightleftharpoons> "CONST Guard (b)\<^sub>e P"
-  "_InputPrefix c x P"         \<rightleftharpoons> "CONST InputPrefix c (\<lambda> x. ((CONST True)\<^sub>e, P))"
+  "_InputPrefix c x P"         \<rightleftharpoons> "CONST InputPrefix c (CONST UNIV) (\<lambda> x. ((CONST True)\<^sub>e, P))"
+  "_InputBPrefix c x A P"      \<rightleftharpoons> "CONST InputPrefix c A (\<lambda> x. ((CONST True)\<^sub>e, P))"
+  "_InputCPrefix c x B P"      \<rightleftharpoons> "CONST InputPrefix c (CONST UNIV) (\<lambda> x. ((B)\<^sub>e, P))"
+  "_InputBCPrefix c x A B P"   \<rightleftharpoons> "CONST InputPrefix c A (\<lambda> x. ((B)\<^sub>e, P))"
   "_OutputPrefix c e P"        \<rightleftharpoons> "CONST OutputPrefix c (e)\<^sub>e P"
   "_SyncPrefix c P"            \<rightleftharpoons> "CONST SyncPrefix c P"
   "_Interleave P Q"            \<rightleftharpoons> "CONST Parallel {} P Q"
@@ -106,6 +115,9 @@ syntax_consts
   "_Spec" \<rightleftharpoons> Spec and
   "_Guard" \<rightleftharpoons> Guard and
   "_InputPrefix" \<rightleftharpoons> InputPrefix and 
+  "_InputBPrefix" \<rightleftharpoons> InputPrefix and
+  "_InputCPrefix" \<rightleftharpoons> InputPrefix and
+  "_InputBCPrefix" \<rightleftharpoons> InputPrefix and
   "_OutputPrefix" \<rightleftharpoons> OutputPrefix and
   "_SyncPrefix" \<rightleftharpoons> SyncPrefix and
   "_Parallel" \<rightleftharpoons> Parallel and
