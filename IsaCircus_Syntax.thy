@@ -53,7 +53,7 @@ consts
   ExtChoiceIdx :: "'i set \<Rightarrow> ('i \<Rightarrow> 'action) \<Rightarrow> 'action"
   Rename       :: "('e \<leftrightarrow> 'f) \<Rightarrow> 'action \<Rightarrow> 'action"
   Hide         :: "'action \<Rightarrow> 'e set \<Rightarrow> 'action"
-  ParallelAct  :: "('a \<Longrightarrow> 's) \<Rightarrow> ('b \<Longrightarrow> 's) \<Rightarrow> 'e set \<Rightarrow> 'action \<Rightarrow> 'action \<Rightarrow> 'action" (infixl "\<lbrakk>_|_|_\<rbrakk>" 58)
+  ParallelAct  :: "('a \<Longrightarrow> 's) \<Rightarrow> ('b \<Longrightarrow> 's) \<Rightarrow> 'e set \<Rightarrow> 'action \<Rightarrow> 'action \<Rightarrow> 'action"
   Parallel     :: "'e set \<Rightarrow> 'action \<Rightarrow> 'action \<Rightarrow> 'action" (infixl "\<lbrakk>_\<rbrakk>" 58)
   Interrupt    :: "'action \<Rightarrow> 'action \<Rightarrow> 'action" (infixl "\<triangle>" 57)
 
@@ -78,6 +78,7 @@ syntax
   "_SyncPrefix"     :: "chan \<Rightarrow> logic \<Rightarrow> logic" ("_ \<rightarrow> _" [59, 60] 60)
   "_Interleave"     :: "logic \<Rightarrow> logic \<Rightarrow> logic" (infixl "\<interleave>" 58)
   "_InterleaveAct"  :: "logic \<Rightarrow> svids \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_|_\<rbrakk> _" [58, 0, 0, 59] 58)
+  "_ParallelAct"    :: "logic \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> svids \<Rightarrow> logic \<Rightarrow> logic" ("_ \<lbrakk>_|_|_\<rbrakk> _" [58, 0, 0, 0, 59] 58)
   "_Hide"           :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<Zhide> _" [60, 61] 61)
   "_Rename"         :: "logic \<Rightarrow> rnenum \<Rightarrow> logic" ("_ [_]" [60, 0] 61)
   "_ExtChoiceIdx"   :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<box>_/\<in>_. _" [0, 0, 10] 10)
@@ -96,6 +97,7 @@ translations
   "_SyncPrefix c P"            \<rightleftharpoons> "CONST SyncPrefix c P"
   "_Interleave"                \<rightleftharpoons> "CONST Parallel {}"
   "_InterleaveAct P ns1 ns2 Q" \<rightleftharpoons> "CONST ParallelAct ns1 ns2 {} P Q"
+  "_ParallelAct P ns1 A ns2 Q" \<rightleftharpoons> "CONST ParallelAct ns1 ns2 A P Q"
   "_Hide P A"                  \<rightleftharpoons> "CONST Hide P A"
   "_Rename P f"                \<rightleftharpoons> "CONST Rename P f"
   "_ExtChoiceIdx x A P"        \<rightleftharpoons> "CONST ExtChoiceIdx A (\<lambda> x. P)"
@@ -114,6 +116,7 @@ syntax_consts
   "_SyncPrefix" \<rightleftharpoons> SyncPrefix and
   "_Interleave" \<rightleftharpoons> Parallel and
   "_InterleaveAct" \<rightleftharpoons> ParallelAct and
+  "_ParallelAct" \<rightleftharpoons> ParallelAct and
   "_Hide" \<rightleftharpoons> Hide and
   "_Rename" \<rightleftharpoons> Rename and
   "_ExtChoiceIdx" \<rightleftharpoons> ExtChoiceIdx and
