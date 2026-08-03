@@ -5,7 +5,6 @@ theory Circus_Toolkit
     Recursive
     Channels_Events
     Trace_Algebra
-    Name_Utils
     Injection_Universe
     IsaCircus_Syntax
 begin end

@@ -40,12 +40,14 @@ subsection \<open> Abstract Constants \<close>
 type_synonym ('a, 'e) channel = "'a \<Longrightarrow>\<^sub>\<triangle> 'e"
 
 consts
+  \<comment> \<open> Specification statement: frame, precondition, postcondition \<close>
   Spec         :: "('a \<Longrightarrow> 's) \<Rightarrow> ('s \<Rightarrow> bool) \<Rightarrow> ('s \<Rightarrow> bool) \<Rightarrow> 'action"
   Skip         :: "'action" ("Skip")
   Stop         :: "'action" ("Stop")
   Chaos        :: "'action" ("Chaos")
   Guard        :: "(bool, 's) expr \<Rightarrow> 'action \<Rightarrow> 'action"
   Assume       :: "(bool, 's) expr \<Rightarrow> 'action"
+  \<comment> \<open> Prefixes \<close>
   InputPrefix  :: "('a, 'e) channel \<Rightarrow> 'a set \<Rightarrow> ('a \<Rightarrow> (('s \<Rightarrow> bool) \<times> 'action)) \<Rightarrow> 'action"
   OutputPrefix :: "('a, 'e) channel \<Rightarrow> ('a, 's) expr \<Rightarrow> 'action \<Rightarrow> 'action"
   SyncPrefix   :: "(unit, 'e) channel \<Rightarrow> 'action \<Rightarrow> 'action"
@@ -65,7 +67,7 @@ definition Replicate :: "('action \<Rightarrow> 'action \<Rightarrow> 'action) \
 subsection \<open> Syntax Translations \<close>
 
 syntax 
-  "_Spec"           :: "svids \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("_:[_,_]" [100,0,0] 100)
+  "_Spec"           :: "svids \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("(_):[_,/ _]" [100,0,0] 100)
   "_Guard"          :: "logic \<Rightarrow> logic \<Rightarrow> logic" ("_ \<^bold>& _" [59, 60] 60)
   "_InputPrefix"    :: "chan \<Rightarrow> pttrn \<Rightarrow> logic \<Rightarrow> logic" ("(3(_)\<^bold>?(_) /\<rightarrow> _)" [59, 0, 60] 60)
   \<comment> \<open> Bounded Prefix \<close>
