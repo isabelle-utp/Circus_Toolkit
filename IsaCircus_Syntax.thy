@@ -86,7 +86,6 @@ syntax
   "_Rename"         :: "logic \<Rightarrow> rnenum \<Rightarrow> logic" ("_ [_]" [60, 0] 61)
   "_ExtChoiceIdx"   :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<box>_/\<in>_. _" [0, 0, 10] 10)
   "_InterleaveIter" :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<interleave>_/\<in> _. _" [0, 0, 10] 10)
-  "_SequentialIter" :: "id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" (";;_/\<in>_. _" [0, 0, 10] 10)
   "_ParallelIter"   :: "logic \<Rightarrow> id \<Rightarrow> logic \<Rightarrow> logic \<Rightarrow> logic" ("\<lbrakk>_\<rbrakk>_/\<in>_. _" [0, 0, 10] 10)
 
 translations 
@@ -107,7 +106,6 @@ translations
   "_Rename P f"                \<rightleftharpoons> "CONST Rename P f"
   "_ExtChoiceIdx x A P"        \<rightleftharpoons> "CONST ExtChoiceIdx A (\<lambda> x. P)"
   "_InterleaveIter x I P"      \<rightleftharpoons> "CONST Replicate (CONST Parallel {}) Skip I (\<lambda> x. P)"
-  "_SequentialIter x I P"      \<rightleftharpoons> "CONST Replicate (CONST useq) Skip I (\<lambda> x. P)"
   "_ParallelIter A x I P"      \<rightleftharpoons> "CONST Replicate (CONST Parallel A) Skip I (\<lambda> x. P)"
 
 syntax_consts 
@@ -127,7 +125,6 @@ syntax_consts
   "_Rename" \<rightleftharpoons> Rename and
   "_ExtChoiceIdx" \<rightleftharpoons> ExtChoiceIdx and
   "_InterleaveIter" \<rightleftharpoons> Parallel and
-  "_SequentialIter" \<rightleftharpoons> useq and
   "_ParallelIter" \<rightleftharpoons> Parallel
 
 unbundle Circus_Syntax
