@@ -27,10 +27,6 @@ no_notation conj (infixr "&" 35)
 no_notation funcset (infixr "\<rightarrow>" 60)
 
 no_syntax
-  "_maplet"  :: "['a, 'a] \<Rightarrow> maplet"             ("_ /\<mapsto>/ _")
-  ""         :: "maplet \<Rightarrow> updbind"              ("_")
-  ""         :: "maplet \<Rightarrow> maplets"             ("_")
-  "_Maplets" :: "[maplet, maplets] \<Rightarrow> maplets" ("_,/ _")
   "_Map"     :: "maplets \<Rightarrow> 'a \<rightharpoonup> 'b"           ("(1[_])")
 
 end
@@ -103,7 +99,7 @@ translations
   "(\<lbrakk>A\<rbrakk>)"                       \<rightleftharpoons> "CONST Parallel A"
   "_ParallelAct P ns1 A ns2 Q" \<rightleftharpoons> "CONST ParallelAct ns1 ns2 A P Q"
   "_Hide P A"                  \<rightleftharpoons> "CONST Hide P A"
-  "_Rename P f"                \<rightleftharpoons> "CONST Rename P f"
+  "_Rename P f"                \<rightleftharpoons> "CONST Rename f P"
   "_ExtChoiceIdx x A P"        \<rightleftharpoons> "CONST ExtChoiceIdx A (\<lambda> x. P)"
   "_InterleaveIter x I P"      \<rightleftharpoons> "CONST Replicate (CONST Parallel {}) Skip I (\<lambda> x. P)"
   "_ParallelIter A x I P"      \<rightleftharpoons> "CONST Replicate (CONST Parallel A) Skip I (\<lambda> x. P)"
